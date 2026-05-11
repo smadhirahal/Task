@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Editor Hub - Liquid Glass</title>
+
+    <!-- This library allows us to take a picture of the HTML -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --system-blue: #0a84ff;
+            --system-blue-hover: #409cff;
+            --system-blue-light: rgba(10, 132, 255, 0.15);
+            --system-green: #30d158;
+            --system-green-light: rgba(48, 209, 88, 0.2);
+            --text-primary: #f5f5f7;
+            --text-secondary: #a1a1a6;
+
+            /* Dark Liquid Glass Effect Colors */
+            --glass-bg: rgba(20, 20, 22, 0.5);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-item: rgba(30, 30, 32, 0.4);
+
+            --shadow-md: 0 15px 35px rgba(0, 0, 0, 0.4);
+            --radius-lg: 24px;
+            --radius-md: 14px;
+            --transition-smooth: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+            /* YOUR CUSTOM BACKGROUND IMAGE */
+            background: url('BG.jpg') no-repeat center center fixed;
+            background-size: cover;
+            background-color: #000;
+            color: var(--text-primary);
+            margin: 0;
+            padding: 40px 20px;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
+
+        /* Liquid Glass Card */
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            border-left: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 30px;
+            transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin: 0;
+            color: #fff;
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0;
+            color: #fff;
+        }
+
+        p.subtitle {
+            color: #aaa;
+            font-size: 15px;
+            margin: 8px 0 24px 0;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 16px;
+            font-size: 15px;
+            font-family: inherit;
+            color: var(--text-primary);
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md);
+            margin-bottom: 16px;
+            box-sizing: border-box;
+            transition: all var(--transition-smooth);
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--system-blue);
+            box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.2);
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        button {
+            background: var(--system-blue);
+            color: white;
+            border: none;
+            padding: 16px 28px;
+            font-size: 15px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all var(--transition-smooth);
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(10, 132, 255, 0.3);
+        }
+
+        button:hover {
+            background: var(--system-blue-hover);
+            transform: scale(1.02);
+        }
+
+        .btn-small {
+            width: auto;
+            padding: 10px 18px;
+            font-size: 13px;
+            border-radius: 20px;
+            background: rgba(30, 30, 32, 0.7);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-small:hover {
+            background: rgba(50, 50, 55, 0.9);
+            transform: scale(1.05);
+        }
+
+        .delete-btn {
+            background: rgba(255, 69, 58, 0.15);
+            color: #ff453a;
+            padding: 10px 18px;
+            font-size: 13px;
+            border-radius: 20px;
+            width: auto;
+            font-weight: 600;
+        }
+
+        .delete-btn:hover {
+            background: #ff453a;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .progress-container {
+            margin: 24px 0;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 12px;
+        }
+
+        .progress-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ddd;
+        }
+
+        .progress-text-done {
+            color: var(--system-blue);
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .progress-text-in-progress {
+            color: #aaa;
+            font-size: 13px;
+            margin-left: 8px;
+            font-weight: 600;
+        }
+
+        .progress-bar-large {
+            background: rgba(0, 0, 0, 0.4);
+            height: 22px;
+            border-radius: 11px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .progress-fill-done {
+            background: linear-gradient(90deg, #30d158, #30b0c7, var(--system-blue));
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            transition: width 0.8s ease;
+            border-radius: 11px;
+            z-index: 2;
+        }
+
+        .progress-fill-in-progress {
+            background: repeating-linear-gradient(45deg, rgba(10, 132, 255, 0.2), rgba(10, 132, 255, 0.2) 10px, rgba(10, 132, 255, 0.3) 10px, rgba(10, 132, 255, 0.3) 20px);
+            height: 100%;
+            position: absolute;
+            top: 0;
+            transition: width 0.8s ease, left 0.8s ease;
+            border-radius: 0 11px 11px 0;
+            z-index: 1;
+        }
+
+        .section-title {
+            font-size: 12px;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin: 28px 0 12px 0;
+            font-weight: 800;
+        }
+
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .task-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--glass-item);
+            padding: 14px 20px;
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all var(--transition-smooth);
+        }
+
+        .task-item:hover {
+            background: rgba(40, 40, 45, 0.7);
+            transform: translateX(4px);
+        }
+
+        .task-content {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            width: 100%;
+        }
+
+        .task-name {
+            font-size: 15px;
+            font-weight: 600;
+            user-select: none;
+            flex-grow: 1;
+            transition: 0.2s;
+            color: #f5f5f7;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            user-select: none;
+            transition: 0.2s;
+            text-align: center;
+            width: 90px;
+        }
+
+        .status-todo {
+            background: rgba(0, 0, 0, 0.4);
+            color: #aaa;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .status-todo:hover {
+            background: rgba(30, 30, 35, 0.8);
+            color: #fff;
+        }
+
+        .status-in-progress {
+            background: var(--system-blue-light);
+            color: var(--system-blue);
+            border: 1px solid rgba(10, 132, 255, 0.3);
+        }
+
+        .status-done {
+            background: var(--system-green-light);
+            color: var(--system-green);
+            border: 1px solid rgba(48, 209, 88, 0.3);
+        }
+
+        .task-item.status-done-row .task-name {
+            text-decoration: line-through;
+            color: #666;
+        }
+
+        .percent-tag {
+            background: rgba(0, 0, 0, 0.5);
+            color: #ccc;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-card {
+            background: rgba(20, 20, 22, 0.85);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 90%;
+            max-width: 500px;
+            padding: 30px;
+            border-radius: var(--radius-lg);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: scale(1);
+        }
+
+        #aiPromptText {
+            height: 220px;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: none;
+            background: rgba(0, 0, 0, 0.3);
+            color: #f5f5f7;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="card">
+            <div class="header-top">
+                <div>
+                    <h1>Pro Editor Hub</h1>
+                    <p class="subtitle">Liquid Glass Interface</p>
+                </div>
+                <button class="btn-small" onclick="openModal()">+ Get AI Prompt</button>
+            </div>
+
+            <input type="text" id="projName" placeholder="Enter Project Name">
+            <textarea id="aiInput" rows="3" placeholder="Paste AI Chapters JSON data here..."></textarea>
+            <button onclick="saveProject()">Create Project</button>
+        </div>
+
+        <div id="projectList"></div>
+
+    </div>
+
+    <!-- MODAL HTML -->
+    <div class="modal-overlay" id="promptModal">
+        <div class="modal-card">
+            <h2 style="margin-bottom: 10px; color: #fff;">Expert AI Prompt</h2>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 15px;">Copy this and paste it into
+                any AI with your script.</p>
+            <textarea id="aiPromptText" readonly>I am a professional documentary editor. Based on the attached Script and Editor Brief, please analyze the video structure. 
+
+1. Identify all Chapters (Intro, Body Parts, Outro).
+2. For each chapter, estimate the weight (Percentage %) based on word count and the complexity of animations described in the brief. Make sure the total adds up to exactly 100.
+3. Provide the output ONLY as a JSON code block in this exact format:
+[
+  {"name": "Intro", "percent": 10},
+  {"name": "The Rise of Tech", "percent": 30}
+]</textarea>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="copyPrompt()" id="copyBtn">Copy Prompt</button>
+                <button onclick="closeModal()" style="background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.1);">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modal Logic
+        function openModal() { document.getElementById('promptModal').classList.add('active'); }
+        function closeModal() {
+            document.getElementById('promptModal').classList.remove('active');
+            document.getElementById("copyBtn").innerHTML = "Copy Prompt";
+            document.getElementById("copyBtn").style.background = "var(--system-blue)";
+        }
+        function copyPrompt() {
+            document.getElementById("aiPromptText").select();
+            document.execCommand("copy");
+            const btn = document.getElementById("copyBtn");
+            btn.innerHTML = "Copied! ✓";
+            btn.style.background = "var(--system-green)";
+        }
+
+        // Image Download Logic
+        function downloadImage(pid) {
+            const card = document.getElementById('card-' + pid);
+
+            // We give it a slight black background just for the screenshot so it is easy to read
+            html2canvas(card, { backgroundColor: '#111111', scale: 2 }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'Project_Progress_' + pid + '.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+
+        // Project Data Logic
+        const startTasks = [
+            { name: "Color Balance", weight: 2.0 },
+            { name: "Voiceover & Audio Leveling", weight: 2.0 },
+            { name: "Rough Cut & Markers", weight: 10.0 }
+        ];
+        const endTasks = [
+            { name: "Final Check-up", weight: 3.0 },
+            { name: "Sound Design (SFX)", weight: 6.5 },
+            { name: "BGM Selection", weight: 6.5 }
+        ];
+
+        let projects = JSON.parse(localStorage.getItem('v4Projects')) || [];
+
+        function saveProject() {
+            const name = document.getElementById('projName').value;
+            const aiData = document.getElementById('aiInput').value;
+            if (!name || !aiData) return alert("Please fill in all fields.");
+            try {
+                let aiChapters = JSON.parse(aiData).map(ch => ({ name: ch.name, weight: (ch.percent / 100) * 70 }));
+                projects.push({ id: Date.now(), name, aiChapters, statuses: {} });
+                localStorage.setItem('v4Projects', JSON.stringify(projects));
+                document.getElementById('projName').value = '';
+                document.getElementById('aiInput').value = '';
+                render();
+            } catch (e) { alert("Invalid JSON format. Please check your AI output."); }
+        }
+
+        function cycleStatus(pid, taskName) {
+            let p = projects.find(x => x.id === pid);
+            let currentStatus = p.statuses[taskName] || 'todo';
+            if (currentStatus === 'todo') { p.statuses[taskName] = 'in-progress'; }
+            else if (currentStatus === 'in-progress') { p.statuses[taskName] = 'done'; }
+            else { p.statuses[taskName] = 'todo'; }
+            localStorage.setItem('v4Projects', JSON.stringify(projects));
+            render();
+        }
+
+        function render() {
+            const list = document.getElementById('projectList');
+            list.innerHTML = '';
+
+            if (projects.length === 0) {
+                list.innerHTML = `<div class="card" style="text-align:center; padding: 40px; color: #aaa; font-weight:600;">No active projects. Create one above to get started.</div>`;
+                return;
+            }
+
+            projects.forEach(p => {
+                let doneProgress = 0; let inProgress = 0;
+                const allTasks = [...startTasks, ...p.aiChapters, ...endTasks];
+
+                allTasks.forEach(t => {
+                    if (p.statuses[t.name] === 'done') doneProgress += t.weight;
+                    if (p.statuses[t.name] === 'in-progress') inProgress += t.weight;
+                });
+
+                let inProgressHtml = inProgress > 0 ? `<span class="progress-text-in-progress">(+${inProgress.toFixed(1)}% In Progress)</span>` : '';
+
+                const createTaskHtml = (t) => {
+                    const status = p.statuses[t.name] || 'todo';
+                    const safeName = encodeURIComponent(t.name).replace(/'/g, "%27");
+                    const escapedName = t.name.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+
+                    let badgeClass = "status-todo"; let badgeText = "To Do"; let rowClass = "";
+                    if (status === 'in-progress') { badgeClass = "status-in-progress"; badgeText = "In Progress"; }
+                    else if (status === 'done') { badgeClass = "status-done"; badgeText = "Done"; rowClass = "status-done-row"; }
+
+                    return `
+                    <div class="task-item ${rowClass}">
+                        <div class="task-content">
+                            <div class="status-badge ${badgeClass}" onclick="cycleStatus(${p.id}, decodeURIComponent('${safeName}'))">${badgeText}</div>
+                            <span class="task-name">${escapedName}</span>
+                        </div>
+                        <span class="percent-tag">${t.weight.toFixed(1)}%</span>
+                    </div>`;
+                };
+
+                list.innerHTML += `
+                <div class="card" id="card-${p.id}">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
+                        <h2>${p.name}</h2>
+                        
+                        <!-- Buttons inside this div will be hidden in the screenshot using data-html2canvas-ignore -->
+                        <div data-html2canvas-ignore="true" style="display:flex; gap:10px;">
+                            <button class="btn-small" onclick="downloadImage(${p.id})">⬇ Save Image</button>
+                            <button class="delete-btn" onclick="projects=projects.filter(x=>x.id!=${p.id});localStorage.setItem('v4Projects',JSON.stringify(projects));render();">Delete</button>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-container">
+                        <div class="progress-header">
+                            <span class="progress-title">Overall Progress</span>
+                            <div>
+                                <span class="progress-text-done">${doneProgress.toFixed(1)}% Done</span>
+                                ${inProgressHtml}
+                            </div>
+                        </div>
+                        <div class="progress-bar-large">
+                            <div class="progress-fill-done" style="width:${doneProgress}%"></div>
+                            <div class="progress-fill-in-progress" style="width:${inProgress}%; left:${doneProgress}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-title">Initial Setup</div>
+                    <div class="task-list">${startTasks.map(t => createTaskHtml(t)).join('')}</div>
+                    
+                    <div class="section-title">Timeline Chapters (70%)</div>
+                    <div class="task-list">${p.aiChapters.map(t => createTaskHtml(t)).join('')}</div>
+                    
+                    <div class="section-title">Final Polish</div>
+                    <div class="task-list">${endTasks.map(t => createTaskHtml(t)).join('')}</div>
+                </div>`;
+            });
+        }
+        render();
+    </script>
+</body>
+
+</html>
